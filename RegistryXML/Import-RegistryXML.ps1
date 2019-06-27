@@ -153,8 +153,8 @@ Write-Host ""
 #	Gather Registry XML
 #======================================================================================
 $GPOPreferences = Get-ChildItem "$ScriptDirectory\ImportXML" *.xml -Recurse
-if ($ProductName -like "*Windows 7*") {$GPOPreferences = $GPOPreferences | Where-Object {$_.FullName -NotLike "*Win10*"}}
-if ($ProductName -like "*Windows 10*") {$GPOPreferences = $GPOPreferences | Where-Object {$_.FullName -NotLike "*Win7*"}}
+if ($ProductName -like "*Windows 7*") {$GPOPreferences = $GPOPreferences | Where-Object {$_.FullName -NotLike "*Win10*" -and $_.FullName -NotLike "*WinServ*"}}
+if ($ProductName -like "*Windows 10*") {$GPOPreferences = $GPOPreferences | Where-Object {$_.FullName -NotLike "*Win7*" -and $_.FullName -NotLike "*WinServ*"}}
 if ($ProductName -like "*Windows Server*") {$GPOPreferences = $GPOPreferences | Where-Object {$_.FullName -NotLike "*Win7*" -and $_.FullName -NotLike "*Win10*"}}
 #======================================================================================
 #	Import Registry XML
@@ -226,7 +226,7 @@ if (!($GPOPreferences)) {
 			if ($RegAction -eq "D") {
 				if ($RegDefault -eq '0' -and $RegName -eq '' -and $RegValue -eq '') {
 					Write-Host "Remove-Item -LiteralPath $RegPath" -ForegroundColor Red
-					Remove-Item -LiteralPath $RegPath -Force
+					Remove-Item -LiteralPath $RegPath -Force -Recurse -Confirm:$False
 				} elseif ($RegDefault -eq '1') {
 					Write-Host "Remove-ItemProperty -LiteralPath $RegPath" -ForegroundColor Red
 					Write-Host "-Name '(Default)'"
@@ -241,7 +241,7 @@ if (!($GPOPreferences)) {
 					if (Test-Path -Path "HKLM:\MountedAdministrator") {
 						Write-Host "Remove-ItemProperty -LiteralPath $RegPathAdmin" -ForegroundColor Red
 						if ($RegDefault -eq '0' -and $RegName -eq '' -and $RegValue -eq '') {
-							Remove-ItemProperty -LiteralPath $RegPathAdmin -Force
+							Remove-Item -LiteralPath $RegPathAdmin -Force -Recurse -Confirm:$False
 						} elseif ($RegDefault -eq '1') {
 							Write-Host "-Name '(Default)'"
 							Remove-ItemProperty -LiteralPath $RegPathAdmin -Name '(Default)' -Force
@@ -253,7 +253,7 @@ if (!($GPOPreferences)) {
 					if (Test-Path -Path "HKLM:\MountedDefaultUser") {
 						Write-Host "Remove-ItemProperty -LiteralPath $RegPathDUser" -ForegroundColor Red
 						if ($RegDefault -eq '0' -and $RegName -eq '' -and $RegValue -eq '') {
-							Remove-ItemProperty -LiteralPath $RegPathDUser -Force
+							Remove-Item -LiteralPath $RegPathDUser -Force -Recurse -Confirm:$False
 						} elseif ($RegDefault -eq '1') {
 							Write-Host "-Name '(Default)'"
 							Remove-ItemProperty -LiteralPath $RegPathDUser -Name '(Default)' -Force
